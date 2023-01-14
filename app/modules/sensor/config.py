@@ -5,6 +5,7 @@ import paho.mqtt.client as mqtt
 
 from database.config import db
 from modules.temperature.models.temperature_model import Temperature
+from modules.humidity.models.humidity_model import Humidity
 
 
 
@@ -27,7 +28,9 @@ def on_message(client, userdata, msg):
     # try:      
     data = random.randint(0,50)
     new_temperature = Temperature(value= data)
+    new_humidity = Humidity(value= data)
     db.add(new_temperature)
+    db.add(new_humidity)
     db.commit()
     # except Exception:
     #     print("error occured")
