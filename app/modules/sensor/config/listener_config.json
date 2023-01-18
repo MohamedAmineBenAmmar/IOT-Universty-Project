@@ -1,0 +1,6 @@
+{
+    "collect": false,
+    "temp": 500,
+    "hum": 1000,
+    "email_sent": false
+}

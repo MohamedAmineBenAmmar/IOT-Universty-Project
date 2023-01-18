@@ -1,5 +1,5 @@
 from config import Base
-from sqlalchemy import MetaData, Table, Column, Float, Integer, DateTime, create_engine
+from sqlalchemy import MetaData, Table, Column, Float, Integer, DateTime, create_engine, String
 from datetime import datetime
 
 
@@ -17,6 +17,15 @@ def main():
     humidities_table = Table('Humidities', metadata,
         Column('id', Integer(), primary_key=True),
         Column('value', Float()),    
+        Column('created_at', DateTime(), default=datetime.now),
+        Column('updated_at', DateTime(), default=datetime.now, onupdate=datetime.now)
+    )
+
+    sensor_config_table = Table('Configurations', metadata,
+        Column('id', Integer(), primary_key=True),
+        Column('temperature', Float()), 
+        Column('humidity', Float()),
+        Column('purpose', String()),   
         Column('created_at', DateTime(), default=datetime.now),
         Column('updated_at', DateTime(), default=datetime.now, onupdate=datetime.now)
     )
