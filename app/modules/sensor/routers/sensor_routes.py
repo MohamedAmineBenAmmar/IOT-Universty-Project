@@ -9,12 +9,12 @@ router = APIRouter(
 )
 
 
-@router.post('/configure', response_model=SensorOutSchema, status_code=status.HTTP_201_CREATED, response_model=SensorConfigOutSchema)
+@router.post('/configure',  status_code=status.HTTP_201_CREATED, response_model=SensorConfigOutSchema)
 async def create_new_sensor_config(new_sensor_config: CreateSensorInSchema):    
     return sensor_config_controller.create_new_sensor_config(new_sensor_config)
 
 
-@router.put('/configure/{id}', response_model=SensorOutSchema, status_code=status.HTTP_202_ACCEPTED, response_model=SensorConfigOutSchema)
+@router.put('/configure/{id}', status_code=status.HTTP_202_ACCEPTED, response_model=SensorConfigOutSchema)
 async def update_sensor_config(id: int, updated_sensor_config: UpdateSensorInSchema):   
     return sensor_config_controller.update_sensor_config(id, updated_sensor_config)
 
@@ -32,8 +32,23 @@ async def get_sensor_config(id: int):
 
 @router.put('/configure_listener', response_model=ListenerConfigOutSchema, status_code=status.HTTP_202_ACCEPTED)
 async def configure_listener(listener_config: ListenerConfigInSchema):
-    sensor_listener_controller.manage_listener(listener_config)
-    return {
-        "state": "Success",
-        "msgs": ["Listener state updated successfully"]
-    }
+    status: int = sensor_listener_controller.manage_listener(listener_config)
+    if status == 0:
+        return {
+            "state": "Success",
+            "msgs": ["Listener state updated successfully"]
+        }
+    elif status == 1:
+        return {
+            "state": "Error",
+            "msgs": ["Start listener failed"]
+        }
+    else:
+        return {
+            "state": "Error",
+            "msgs": ["Shuttingdown listener failed"]
+        }
+
+# Create an endpoint to get the listener state
+# ...
+    

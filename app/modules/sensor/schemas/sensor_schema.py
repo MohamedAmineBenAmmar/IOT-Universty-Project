@@ -40,5 +40,5 @@ class ListenerConfigOutSchema(OutSchema):
     pass
 
 
-class ListenerConfigInSchema():
+class ListenerConfigInSchema(BaseModel):
     collect: bool

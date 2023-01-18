@@ -42,7 +42,7 @@ class SensorConfigController():
         sensor_config.update(**updated_sensor_config.dict())
         db.commit()
 
-        # Update the listener file with the new values to listen for
+        # Update the listener file with the new values to listen for change the value of temp and hum
         # ...
         
         return sensor_config.first()

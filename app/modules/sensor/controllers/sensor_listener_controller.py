@@ -3,11 +3,24 @@ import json
 
 class SensorListenerController():
 
-    def manage_listener(self, listener_config: ListenerConfigInSchema):
+    def manage_listener(self, listener_config: ListenerConfigInSchema) -> int:
+        # The return type of this function follows the same principe as C
+        # 0: Success
+        # 1: Error in starting the listener
+        # 2: Error in shutingdown the listener
+        status = 0
         if listener_config.collect:
-            self.__start_listener()
+            try:
+                self.__start_listener()
+            except:
+                status = 1
         else:
-            self.__shutdown_listener()
+            try:
+                self.__shutdown_listener()
+            except: 
+                status = 2
+
+        return status
 
     def __start_listener(self):
         with open('modules/sensor/config/listener_config.json', "r") as f:
@@ -27,6 +40,10 @@ class SensorListenerController():
 
         with open('modules/sensor/config/listener_config.json', "w") as f:
             f.write(data)
+
+
+    # Create a function that will return the state of the listener
+    # ...
 
 
 

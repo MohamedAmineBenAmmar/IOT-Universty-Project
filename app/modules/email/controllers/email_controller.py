@@ -10,13 +10,13 @@ class Email():
             MAIL_FROM=settings.mail_from,
             MAIL_PORT=settings.mail_port,
             MAIL_SERVER=settings.mail_server,
-            MAIL_FROM_NAME=settings.mail_from_name,
-            MAIL_TLS=True,
-            MAIL_SSL=False,
-            USE_CREDENTIALS=True,
-            TEMPLATE_FOLDER=EMAIL_TEMPLATES_PATH
+            MAIL_FROM_NAME=settings.mail_from_name,       
+            VALIDATE_CERTS=True,
+            TEMPLATE_FOLDER=EMAIL_TEMPLATES_PATH,
+            MAIL_SSL_TLS=False,
+            MAIL_STARTTLS=True,
+            USE_CREDENTIALS=True
         )
-
 
     async def send_email_async(self, subject: str, email_to: str, body: dict, template_name: str):
         message = MessageSchema(
@@ -26,8 +26,7 @@ class Email():
             subtype='html',
         )
         
-        fm = FastMail(self.config)
-        # await fm.send_message(message, template_name='email.html')
+        fm = FastMail(self.config)        
         await fm.send_message(message, template_name=template_name)
 
 
