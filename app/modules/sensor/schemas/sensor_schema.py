@@ -39,6 +39,9 @@ class SensorOutSchema(OutSchema):
 class ListenerConfigOutSchema(OutSchema):
     pass
 
+class ListenerStateOutSchema(BaseModel):
+    state: bool
+
 
 class ListenerConfigInSchema(BaseModel):
     collect: bool

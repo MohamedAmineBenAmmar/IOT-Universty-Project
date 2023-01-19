@@ -1,6 +1,7 @@
 from ..schemas.sensor_schema import CreateSensorInSchema, UpdateSensorInSchema, ListenerConfigInSchema
 import json
 
+
 class SensorListenerController():
 
     def manage_listener(self, listener_config: ListenerConfigInSchema) -> int:
@@ -17,7 +18,7 @@ class SensorListenerController():
         else:
             try:
                 self.__shutdown_listener()
-            except: 
+            except:
                 status = 2
 
         return status
@@ -25,27 +26,25 @@ class SensorListenerController():
     def __start_listener(self):
         with open('modules/sensor/config/listener_config.json', "r") as f:
             data = json.load(f)
-       
+
         data["collect"] = True
 
         with open('modules/sensor/config/listener_config.json', "w") as f:
-            f.write(data)
+            json.dump(data, f)
 
-    
     def __shutdown_listener(self):
         with open('modules/sensor/config/listener_config.json', "r") as f:
             data = json.load(f)
-       
+
         data["collect"] = False
 
         with open('modules/sensor/config/listener_config.json', "w") as f:
-            f.write(data)
+            json.dump(data, f)
 
-
-    # Create a function that will return the state of the listener
-    # ...
-
-
+    def get_listener_state(self) -> bool:
+        with open('modules/sensor/config/listener_config.json', "r") as f:
+            data = json.load(f)
+        return data['collect']
 
 
 sensor_listener_controller = SensorListenerController()

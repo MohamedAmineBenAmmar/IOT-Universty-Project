@@ -9,7 +9,7 @@ router = APIRouter(
 
 @router.get('/send-email/asynchronous')
 async def send_email_asynchronous():
-    await email_sender.send_email_async('Hello World','achrafb.s2015@gmail.com',
-    {'title': 'Hello World', 'name': 'John Doe'}, NOTIFICATION_EMAIL_TEMPLATE)
+    await email_sender.send_email_async('Temperature Alert','achrafb.s2015@gmail.com',
+        {'title': 'Temperature ', 'name': 'Alert we detected a raise in the temperature !!!'}, NOTIFICATION_EMAIL_TEMPLATE)
     return 'Success'
 

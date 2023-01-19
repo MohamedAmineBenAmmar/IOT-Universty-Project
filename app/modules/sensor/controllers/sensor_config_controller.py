@@ -3,7 +3,11 @@ from ..models.sensor_config_model import Configuration
 from sqlalchemy.orm import Session
 from database.config import db
 from fastapi import status, HTTPException
-
+import subprocess
+import os
+import json
+from ..config.sensor_config import listen
+from multiprocessing import Process
 
 class SensorConfigController():
 
@@ -27,8 +31,19 @@ class SensorConfigController():
         db.commit()
         db.refresh(sensor_config)
 
-        # Start the process that will listen for the simulation + write the values to the listener file json file
-        #...
+        with open('modules/sensor/config/listener_config.json', "r") as f:
+            data = json.load(f)  
+
+        data["temp"] = new_sensor_config.temperature
+        data["hum"] = new_sensor_config.humidity
+
+        print("data ")
+        print(data)
+        with open('modules/sensor/config/listener_config.json', "w") as f:
+            json_string = json.dumps(data, default=lambda o: o.__dict__, sort_keys=True, indent=2)
+            f.write(json_string)
+
+        subprocess.Popen(f"python3 modules/sensor/config/sensor_config.py &", shell=True)
 
         return sensor_config
 
@@ -39,13 +54,25 @@ class SensorConfigController():
         if not sensor_config.first():
             raise HTTPException(status_code=404, detail=f"Sensor configuration with the id = {id} is not found")
 
-        sensor_config.update(**updated_sensor_config.dict())
+        #print(updated_sensor_config.dict())
+        sensor_config: Configuration = sensor_config.first()
+        sensor_config.temperature = updated_sensor_config.temperature
+        sensor_config.humidity = updated_sensor_config.humidity
+        sensor_config.purpose = updated_sensor_config.purpose
+        
         db.commit()
 
-        # Update the listener file with the new values to listen for change the value of temp and hum
-        # ...
+        with open('modules/sensor/config/listener_config.json', "r") as f:
+            data = json.load(f)  
+
+        data["temp"] = updated_sensor_config.temperature
+        data["hum"] = updated_sensor_config.humidity
+
+        with open('modules/sensor/config/listener_config.json', "w") as f:
+            json_string = json.dumps(data, default=lambda o: o.__dict__, sort_keys=True, indent=2)
+            f.write(json_string)
         
-        return sensor_config.first()
+        return sensor_config
 
         
     def delete_sensor_config(self, id: int) -> None:
@@ -57,7 +84,25 @@ class SensorConfigController():
         sensor_config.delete(synchronize_session=False)
         db.commit()
 
-        # Kill the process that listening to the simulation + reset the file ot the init values
+        with open('modules/sensor/config/listener_config.json', "r") as f:
+            data = json.load(f)  
+
+    
+        result = os.system(f'kill -9 {data["pid"]}')
+        if result != 0:
+            raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail=f'No process with PID = {data["pid"]}')
+
+        data["temp"] = 9999
+        data["hum"] = 9999
+        data["collect"] = False
+        data["email_sent"] = False
+        data["pid"] = -1
+
+        with open('modules/sensor/config/listener_config.json', "w") as f:
+            json.dump(data, f)
+        
+
 
 
   
