@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Security, status, Response
-from ..schemas.sensor_schema import CreateSensorInSchema, SensorOutSchema, UpdateSensorInSchema, SensorConfigOutSchema, ListenerConfigInSchema, ListenerConfigOutSchema, ListenerStateOutSchema
+from ..schemas.sensor_schema import CreateSensorInSchema, SensorOutSchema, UpdateSensorInSchema, SensorConfigOutSchema, ListenerConfigInSchema, ListenerConfigOutSchema, ListenerStateOutSchema, ReceiverInSchema, EmailNotificationsFlagsInSchema
 from ..controllers.sensor_listener_controller import sensor_listener_controller
 from ..controllers.sensor_config_controller import sensor_config_controller
 
@@ -55,3 +55,35 @@ async def get_listener_state():
     return {
         "state": sensor_listener_controller.get_listener_state()
     }
+
+
+@router.post('/set/receiver',  status_code=status.HTTP_201_CREATED, response_model=ListenerConfigOutSchema)
+async def set_listener_notifications_receiver(receiver: ReceiverInSchema):
+    status:int = sensor_config_controller.set_receiver_email(receiver)
+    if status == 0:
+        return {
+            "state": "Success",
+            "msgs": ["Listener notifications receiver is set successfully"]
+        }
+
+    else:
+        return {
+            "state": "Error",
+            "msgs": ["Error occured while setting the listener notifications receiver"]
+        }
+
+
+@router.put('/reset_email_notifications_flags', response_model=ListenerConfigOutSchema, status_code=status.HTTP_202_ACCEPTED)
+async def reset_email_notifications_flags(email_notifications_flags: EmailNotificationsFlagsInSchema):
+    status: int = sensor_config_controller.reset_email_notifications_flags(email_notifications_flags)
+    if status == 0:
+        return {
+            "state": "Success",
+            "msgs": ["Email notifications flags updated successfully"]
+        }   
+    else:
+        return {
+            "state": "Error",
+            "msgs": ["Email notifications flags update error"]
+        }
+

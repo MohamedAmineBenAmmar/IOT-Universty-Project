@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Literal, List
 from datetime import datetime
 
@@ -45,3 +45,11 @@ class ListenerStateOutSchema(BaseModel):
 
 class ListenerConfigInSchema(BaseModel):
     collect: bool
+
+
+class ReceiverInSchema(BaseModel):
+    email: EmailStr
+
+class EmailNotificationsFlagsInSchema(BaseModel):
+    hum_email_sent: bool
+    temp_email_sent: bool

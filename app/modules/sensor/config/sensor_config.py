@@ -9,7 +9,8 @@ import paho.mqtt.client as mqtt
 import json
 import os
 from settings.settings import NOTIFICATION_EMAIL_TEMPLATE
-from modules.email.controllers.email_controller import email_sender
+import subprocess
+from time import sleep
 
 
 
@@ -20,6 +21,8 @@ def on_connect(client, userdata, flags, rc):
     # reconnect then subscriptions will be renewed.
     client.subscribe("topic_sensor_humidity")
     client.subscribe("topic_sensor_temperature")
+
+
 
 
 # MQTT callback function for when a PUBLISH message is received from the server
@@ -40,30 +43,38 @@ def on_message(client, userdata, msg):
     print(value)
 
     if nature == 'temp' and value >= data["temp"] and not data["temp_email_sent"]:
-        email_sender.send_email_async('Temperature Alert', data['receiver'],
-        {'title': 'Temperature ', 'name': 'Alert we detected a raise in the temperature !!!'}, NOTIFICATION_EMAIL_TEMPLATE)
+        subprocess.Popen(f'python3 utilities/notification_sender.py temperature {data["receiver"]} &', shell=True)
 
-        # Update the email send flag
-        # ...
+        with open('modules/sensor/config/listener_config.json', "r") as f:
+            data = json.load(f)  
+
+        data["temp_email_sent"] = True
+
+        with open('modules/sensor/config/listener_config.json', "w") as f:
+            json.dump(data, f)
 
     if nature == 'hum' and value >= data["hum"] and not data["hum_email_sent"]:
-        email_sender.send_email_async('Hello World', data['receiver'],
-        {'title': 'Humidity ', 'name': 'Alert we detected a raise in the humidity !!!'}, NOTIFICATION_EMAIL_TEMPLATE)
+        subprocess.Popen(f'python3 utilities/notification_sender.py humidity {data["receiver"]} &', shell=True)
 
-        # Update the email send flag
-        # ...
+        with open('modules/sensor/config/listener_config.json', "r") as f:
+            data = json.load(f)  
+
+        data["hum_email_sent"] = True
+
+        with open('modules/sensor/config/listener_config.json', "w") as f:
+            json.dump(data, f)
 
     if data["collect"]:
         try:
             if nature == 'temp':
-                new_temperature = Temperature(value=payload)
+                new_temperature = Temperature(value=value)
                 db.add(new_temperature)
             else:
-                new_humidity = Humidity(value=payload)
+                new_humidity = Humidity(value=value)
                 db.add(new_humidity)
             db.commit()
-        except Exception:
-            print("error occured")
+        except Exception as e:
+            print(e)
 
 
 def set_my_pid():

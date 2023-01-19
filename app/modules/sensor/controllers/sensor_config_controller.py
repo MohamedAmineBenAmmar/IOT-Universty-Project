@@ -96,22 +96,59 @@ class SensorConfigController():
         data["temp"] = 9999
         data["hum"] = 9999
         data["collect"] = False
-        data["email_sent"] = False
+        data["temp_email_sent"] = False
+        data["hum_email_sent"] = False
         data["pid"] = -1
+        data["receiver"] = None
 
         with open('modules/sensor/config/listener_config.json', "w") as f:
             json.dump(data, f)
-        
 
 
-
-  
     def get_sensor_config(self, id: int) -> Configuration:
         sensor_config = db.query(Configuration).filter(Configuration.id == id).first()
         if not sensor_config:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Sensor configuration with id = {id} is not found")
 
         return sensor_config
+
+    def set_receiver_email(self, receiver: ReceiverInSchema) -> int:        
+        status = 0
+        try:
+            with open('modules/sensor/config/listener_config.json', "r") as f:
+                data = json.load(f)  
+
+            data["receiver"] = receiver.email
+
+            with open('modules/sensor/config/listener_config.json', "w") as f:
+                json.dump(data, f)
+        except Exception as e:
+            status = 1
+
+        return status
+
+    def reset_email_notifications_flags(self, email_notifications_flags: EmailNotificationsFlagsInSchema) -> int:
+        try:
+            with open('modules/sensor/config/listener_config.json', "r") as f:
+                data = json.load(f)  
+
+            if email_notifications_flags.temp_email_sent:
+                data["temp_email_sent"] = False
+
+            if email_notifications_flags.hum_email_sent:
+                data["hum_email_sent"] = False
+
+            with open('modules/sensor/config/listener_config.json', "w") as f:
+                json.dump(data, f)
+
+            return 0
+        except Exception as exception:
+            return 1
+        
+
+
+
+        
 
 
 
