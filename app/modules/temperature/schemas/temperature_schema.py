@@ -9,3 +9,11 @@ class TemperatureOutSchema(BaseModel):
 
     class Config():
         orm_mode = True
+        
+class DailyTemperatureOutSchema(BaseModel):
+    hour: str
+    min_temp: float
+    max_temp: float
+    
+    class Config():
+        orm_mode = True

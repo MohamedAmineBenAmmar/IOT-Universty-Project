@@ -10,3 +10,5 @@ To collect data from the censor:  py modules/sensor/config.py
     "pid": -1,
     "receiver": null
 }
+
+https://wokwi.com/projects/350238486812426835?fbclid=IwAR0qZ6K7aMbCg76KFUYzWfYZoRMIm3gSXDsrXtRraPcFol04CN77XdH0Ma8
