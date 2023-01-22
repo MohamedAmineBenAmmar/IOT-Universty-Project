@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Security, status, Response
-from ..schemas.sensor_schema import CreateSensorInSchema, SensorOutSchema, UpdateSensorInSchema, SensorConfigOutSchema, ListenerConfigInSchema, ListenerConfigOutSchema, ListenerStateOutSchema, ReceiverInSchema, EmailNotificationsFlagsInSchema
+from ..schemas.sensor_schema import CreateSensorInSchema, SensorOutSchema, UpdateSensorInSchema, SensorConfigOutSchema, ListenerReceiverOutSchema, ListenerConfigInSchema, ListenerConfigOutSchema, ListenerStateOutSchema, ReceiverInSchema, EmailNotificationsFlagsInSchema
 from ..controllers.sensor_listener_controller import sensor_listener_controller
 from ..controllers.sensor_config_controller import sensor_config_controller
 
@@ -71,6 +71,12 @@ async def set_listener_notifications_receiver(receiver: ReceiverInSchema):
             "state": "Error",
             "msgs": ["Error occured while setting the listener notifications receiver"]
         }
+
+@router.get('/get/receiver',  status_code=200, response_model=ListenerReceiverOutSchema | None)
+async def get_listener_notifications_receiver():
+    return {
+        "email": sensor_config_controller.get_receiver_email()
+    }
 
 
 @router.put('/reset_email_notifications_flags', response_model=ListenerConfigOutSchema, status_code=status.HTTP_202_ACCEPTED)

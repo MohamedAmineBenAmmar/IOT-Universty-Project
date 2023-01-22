@@ -127,6 +127,16 @@ class SensorConfigController():
 
         return status
 
+    def get_receiver_email(self) -> str:               
+        try:
+            with open('modules/sensor/config/listener_config.json', "r") as f:
+                data = json.load(f)  
+
+            return data["receiver"]
+
+        except Exception as e:
+            print(e)
+
     def reset_email_notifications_flags(self, email_notifications_flags: EmailNotificationsFlagsInSchema) -> int:
         try:
             with open('modules/sensor/config/listener_config.json', "r") as f:
