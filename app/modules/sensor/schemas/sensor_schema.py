@@ -53,3 +53,7 @@ class ReceiverInSchema(BaseModel):
 class EmailNotificationsFlagsInSchema(BaseModel):
     hum_email_sent: bool
     temp_email_sent: bool
+
+
+class ListenerReceiverOutSchema(BaseModel):
+    email: str | None
